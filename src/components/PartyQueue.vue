@@ -26,13 +26,13 @@
           </div>
 
           <q-badge
-            v-if="currentlyPlaying.is_playing && remainingSeconds <= 12 && remainingSeconds > 0"
+            v-if="currentlyPlaying.is_playing && remainingSeconds <= 20 && remainingSeconds > 0"
             color="orange-9"
             text-color="white"
             class="text-weight-bold pulse-badge q-px-sm q-py-xs"
           >
             <q-icon name="sync" class="rotate-sync q-mr-xs" size="14px" />
-            Übergang aktiv (&le; 12s)
+            Übergang aktiv (&le; 20s)
           </q-badge>
           <q-badge
             v-else-if="currentlyPlaying.is_playing"
@@ -54,6 +54,25 @@
             <div class="text-subtitle1 text-weight-bolder ellipsis text-white">{{ currentlyPlaying.name }}</div>
             <div class="text-caption text-grey-4 ellipsis">{{ currentlyPlaying.artist_display }}</div>
             <div class="text-caption text-grey-5 ellipsis">{{ currentlyPlaying.album_name }}</div>
+          </div>
+
+          <!-- Skip Button (Host only) -->
+          <div v-if="isHost" class="q-ml-sm flex-shrink-0">
+            <q-btn
+              unelevated
+              rounded
+              color="grey-8"
+              text-color="white"
+              icon="skip_next"
+              label="Skip"
+              class="text-weight-bold q-px-md hover-scale"
+              style="border: 1px solid rgba(255, 255, 255, 0.15);"
+              :loading="isSkipping"
+              no-caps
+              @click="handleSkipTrack"
+            >
+              <q-tooltip>Nächsten Song abspielen (Host)</q-tooltip>
+            </q-btn>
           </div>
         </div>
 
@@ -185,7 +204,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useAuth } from '@/composables/useAuth'
 import { useRoom } from '@/composables/useRoom'
@@ -199,7 +218,9 @@ const props = defineProps({
 
 const $q = useQuasar()
 const { user } = useAuth()
-const { currentRoom, isHost, guestId, voteTrack, removeFromQueue } = useRoom()
+const { currentRoom, isHost, guestId, voteTrack, removeFromQueue, skipTrack } = useRoom()
+
+const isSkipping = ref(false)
 
 const queue = computed(() => currentRoom.value?.queue || [])
 const currentlyPlaying = computed(() => currentRoom.value?.currently_playing)
@@ -263,6 +284,32 @@ async function handleRemove(track) {
     }
   } catch (err) {
     console.error(err)
+  }
+}
+
+async function handleSkipTrack() {
+  if (isSkipping.value) return
+  isSkipping.value = true
+  try {
+    await skipTrack(props.roomCode)
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'positive',
+        message: 'Song übersprungen!',
+        icon: 'skip_next',
+        timeout: 1200
+      })
+    }
+  } catch (err) {
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'negative',
+        message: err.message || 'Fehler beim Überspringen.',
+        timeout: 2500
+      })
+    }
+  } finally {
+    isSkipping.value = false
   }
 }
 

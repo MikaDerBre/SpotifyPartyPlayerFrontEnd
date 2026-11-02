@@ -1,10 +1,15 @@
-// Dynamic API base URL: Uses the current hostname so mobile devices in the same LAN
-// automatically connect to http://<host-ip>:3000 instead of attempting localhost/127.0.0.1
+// Dynamic API base URL:
+// In dev (port 9000), point to backend port 3000.
+// In production (served by Axum or behind a reverse proxy/domain), use window.location.origin.
 export function getApiBaseUrl() {
-  if (typeof window !== 'undefined' && window.location?.hostname) {
-    return `http://${window.location.hostname}:3000`
+  if (typeof window !== 'undefined' && window.location) {
+    if (window.location.port === '9000') {
+      return `http://${window.location.hostname}:3000`
+    }
+    return window.location.origin
   }
   return 'http://127.0.0.1:3000'
 }
 
 export const API_BASE_URL = getApiBaseUrl()
+

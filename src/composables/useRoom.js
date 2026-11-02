@@ -238,6 +238,31 @@ export function useRoom() {
     }
   }
 
+  async function skipTrack(code) {
+    if (!code) return null
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/rooms/${code.toUpperCase()}/playback/skip`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token.value ? { Authorization: `Bearer ${token.value}` } : {})
+        }
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Fehler beim Überspringen des Songs.')
+      }
+
+      const data = await res.json()
+      await fetchRoom(code)
+      return data
+    } catch (err) {
+      console.error('Failed to skip track:', err)
+      throw err
+    }
+  }
+
   return {
     currentRoom,
     isHost,
@@ -251,6 +276,8 @@ export function useRoom() {
     closeRoom,
     addToQueue,
     voteTrack,
-    removeFromQueue
+    removeFromQueue,
+    skipTrack
   }
 }
+

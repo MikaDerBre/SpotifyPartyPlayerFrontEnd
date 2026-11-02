@@ -24,101 +24,101 @@
       </div>
 
       <!-- ROOM CONTENT -->
-      <div v-else-if="currentRoom" class="column q-gutter-lg">
+      <div v-else-if="currentRoom" class="row q-col-gutter-lg">
 
-        <!-- Top Header Card -->
-        <q-card class="bg-grey-10 text-white shadow-8" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
-          <q-card-section class="q-pa-md q-pa-md-lg">
-            <div class="row items-center justify-between q-col-gutter-sm">
-              <!-- Left info: Icon, Name, Host -->
-              <div class="row items-center no-wrap q-gutter-md ellipsis col-12 col-sm-auto" style="min-width: 0;">
-                <q-avatar size="50px" class="bg-primary text-black flex-shrink-0">
-                  <q-icon name="celebration" size="28px" />
-                </q-avatar>
-                <div class="ellipsis" style="min-width: 0;">
-                  <div class="row items-center q-gutter-sm no-wrap ellipsis">
-                    <span class="text-h5 text-weight-bolder ellipsis">{{ currentRoom.name }}</span>
-                    <q-badge color="positive" class="text-bold" label="LIVE" style="font-size: 11px;" />
-                    <q-badge
-                      v-if="isHost"
-                      color="amber-9"
-                      text-color="black"
-                      class="text-bold"
-                      label="HOST"
-                      style="font-size: 11px;"
-                    />
-                  </div>
-                  <div class="text-body2 text-grey-4 ellipsis q-mt-xs">
-                    Host: <b class="text-white">{{ currentRoom.host_name }}</b>
-                    <span class="q-mx-sm">•</span>
-                    <span><q-icon name="group" size="16px" class="q-mr-xs" />{{ currentRoom.member_count }} Gäste</span>
+        <!-- Top Header Card (col-12, perfectly aligned with the grid below) -->
+        <div class="col-12">
+          <q-card class="bg-grey-10 text-white shadow-8" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <q-card-section class="q-pa-md q-pa-md-lg">
+              <div class="row items-center justify-between q-col-gutter-sm">
+                <!-- Left info: Icon, Name, Host -->
+                <div class="row items-center no-wrap q-gutter-md ellipsis col-12 col-sm-auto" style="min-width: 0;">
+                  <q-avatar size="50px" class="bg-primary text-black flex-shrink-0">
+                    <q-icon name="celebration" size="28px" />
+                  </q-avatar>
+                  <div class="ellipsis" style="min-width: 0;">
+                    <div class="row items-center q-gutter-sm no-wrap ellipsis">
+                      <span class="text-h5 text-weight-bolder ellipsis">{{ currentRoom.name }}</span>
+                      <q-badge color="positive" class="text-bold" label="LIVE" style="font-size: 11px;" />
+                      <q-badge
+                        v-if="isHost"
+                        color="amber-9"
+                        text-color="black"
+                        class="text-bold"
+                        label="HOST"
+                        style="font-size: 11px;"
+                      />
+                    </div>
+                    <div class="text-body2 text-grey-4 ellipsis q-mt-xs">
+                      Host: <b class="text-white">{{ currentRoom.host_name }}</b>
+                      <span class="q-mx-sm">•</span>
+                      <span><q-icon name="group" size="16px" class="q-mr-xs" />{{ currentRoom.member_count }} Gäste</span>
+                    </div>
                   </div>
                 </div>
+
+                <!-- Action Buttons -->
+                <div class="row items-center q-gutter-sm col-12 col-sm-auto justify-end q-mt-xs q-mt-sm-none flex-shrink-0">
+                  <q-btn
+                    v-if="isHost"
+                    unelevated
+                    rounded
+                    color="primary"
+                    text-color="black"
+                    icon="qr_code_2"
+                    label="Beamer-QR"
+                    class="text-weight-bold q-px-md"
+                    no-caps
+                    @click="showFullscreenQR = true"
+                  >
+                    <q-tooltip>QR-Code im Großformat anzeigen</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    v-if="isHost"
+                    outline
+                    rounded
+                    color="negative"
+                    icon="close"
+                    label="Raum beenden"
+                    class="text-weight-bold q-px-md"
+                    no-caps
+                    @click="handleCloseRoom"
+                  >
+                    <q-tooltip>Raum schließen</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    v-else
+                    outline
+                    rounded
+                    color="grey-4"
+                    icon="logout"
+                    label="Raum verlassen"
+                    class="text-weight-bold q-px-md"
+                    no-caps
+                    @click="handleLeaveRoom"
+                  >
+                    <q-tooltip>Raum verlassen</q-tooltip>
+                  </q-btn>
+                </div>
               </div>
+            </q-card-section>
+          </q-card>
+        </div>
 
-              <!-- Action Buttons -->
-              <div class="row items-center q-gutter-sm col-12 col-sm-auto justify-end q-mt-xs q-mt-sm-none flex-shrink-0">
-                <q-btn
-                  v-if="isHost"
-                  unelevated
-                  rounded
-                  color="primary"
-                  text-color="black"
-                  icon="qr_code_2"
-                  label="Beamer-QR"
-                  class="text-weight-bold q-px-md"
-                  no-caps
-                  @click="showFullscreenQR = true"
-                >
-                  <q-tooltip>QR-Code im Großformat anzeigen</q-tooltip>
-                </q-btn>
-                <q-btn
-                  v-if="isHost"
-                  outline
-                  rounded
-                  color="negative"
-                  icon="close"
-                  label="Raum beenden"
-                  class="text-weight-bold q-px-md"
-                  no-caps
-                  @click="handleCloseRoom"
-                >
-                  <q-tooltip>Raum schließen</q-tooltip>
-                </q-btn>
-                <q-btn
-                  v-else
-                  outline
-                  rounded
-                  color="grey-4"
-                  icon="logout"
-                  label="Raum verlassen"
-                  class="text-weight-bold q-px-md"
-                  no-caps
-                  @click="handleLeaveRoom"
-                >
-                  <q-tooltip>Raum verlassen</q-tooltip>
-                </q-btn>
-              </div>
-            </div>
-          </q-card-section>
-        </q-card>
-
-        <!-- Main Responsive Grid:
-             Left: Party-Queue & Song-Suche (col-md-7)
-             Right: QR-Code & Party-Gäste (col-md-5) -->
-        <div class="row q-col-gutter-lg">
-
-          <!-- Left Column: Party Queue & Song Search -->
-          <div class="col-12 col-md-7 column q-gutter-lg">
+        <!-- Left Column: Party Queue & Song Search -->
+        <div class="col-12 col-md-7">
+          <div class="q-gutter-y-lg">
             <!-- Live Party Queue with Voting & Currently Playing -->
             <PartyQueue :room-code="currentRoom.code" />
 
             <!-- Song Search -->
             <SongSearch :room-code="currentRoom.code" />
           </div>
+        </div>
 
-          <!-- Right Column: QR Code & Guest List -->
-          <div class="col-12 col-md-5 column q-gutter-lg">
+        <!-- Right Column: QR Code & Guest List -->
+        <div class="col-12 col-md-5">
+          <div class="q-gutter-y-lg">
 
             <!-- QR Code & Share Card -->
             <q-card class="bg-grey-10 text-white shadow-8 text-center q-pa-md q-pa-md-lg" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
