@@ -7,7 +7,7 @@
           Song-Suche
         </div>
         <div v-if="tracks.length" class="text-caption text-grey-4">
-          {{ tracks.length }} Ergebnisse
+          {{ tracks.length }} Treffer
         </div>
       </div>
 
@@ -18,7 +18,7 @@
         dark
         dense
         color="primary"
-        placeholder="Song, Künstler oder Album suchen..."
+        placeholder="Song oder Künstler suchen (Klicke zum Hinzufügen)..."
         class="bg-grey-9 text-white"
         style="border-radius: 10px;"
         :loading="isSearching"
@@ -55,6 +55,7 @@
             :key="track.id"
             class="q-py-sm track-item"
             clickable
+            @click="handleTrackClick(track)"
           >
             <!-- Album Cover -->
             <q-item-section avatar>
@@ -85,9 +86,30 @@
               </q-item-label>
             </q-item-section>
 
-            <!-- Duration & Spotify badge -->
-            <q-item-section side class="text-right">
-              <span class="text-caption text-grey-4">{{ formatDuration(track.duration_ms) }}</span>
+            <!-- Action / In Queue Status -->
+            <q-item-section side class="row items-center no-wrap q-gutter-x-sm">
+              <span class="text-caption text-grey-5">{{ formatDuration(track.duration_ms) }}</span>
+
+              <template v-if="isInQueue(track.id)">
+                <q-badge color="positive" text-color="black" class="q-py-xs q-px-sm text-bold">
+                  <q-icon name="check" size="14px" class="q-mr-xs" />
+                  In Queue ({{ getQueueVotes(track.id) }} Votes)
+                </q-badge>
+              </template>
+
+              <template v-else>
+                <q-btn
+                  round
+                  dense
+                  unelevated
+                  size="sm"
+                  color="primary"
+                  text-color="black"
+                  icon="add"
+                >
+                  <q-tooltip>Zur Party-Queue hinzufügen</q-tooltip>
+                </q-btn>
+              </template>
             </q-item-section>
           </q-item>
         </q-list>
@@ -103,7 +125,7 @@
         <div v-else class="column items-center q-py-lg text-center text-grey-5">
           <q-icon name="library_music" size="48px" class="q-mb-xs text-grey-7" />
           <div class="text-subtitle2 text-grey-4">Finde deine Lieblingssongs</div>
-          <div class="text-caption text-grey-6">Tippe oben einen Titel oder Künstlernamen ein, um Spotify zu durchsuchen.</div>
+          <div class="text-caption text-grey-6">Klicke einen Song an, um ihn direkt in die Party-Queue einzureihen!</div>
         </div>
 
       </div>
@@ -112,8 +134,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useQuasar } from 'quasar'
 import { useAuth } from '@/composables/useAuth'
+import { useRoom } from '@/composables/useRoom'
 
 const props = defineProps({
   roomCode: {
@@ -122,13 +146,28 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['track-added'])
+
+const $q = useQuasar()
 const { token, API_BASE_URL } = useAuth()
+const { currentRoom, addToQueue } = useRoom()
 
 const searchQuery = ref('')
 const tracks = ref([])
 const isSearching = ref(false)
 const errorMessage = ref('')
 let debounceTimer = null
+
+const queueItems = computed(() => currentRoom.value?.queue || [])
+
+function isInQueue(trackId) {
+  return queueItems.value.some(item => item.track_id === trackId)
+}
+
+function getQueueVotes(trackId) {
+  const item = queueItems.value.find(i => i.track_id === trackId)
+  return item ? item.votes : 0
+}
 
 function onInputChanged(val) {
   if (debounceTimer) {
@@ -188,6 +227,43 @@ async function executeSearch(query) {
     errorMessage.value = err.message || 'Spotify Suche fehlgeschlagen.'
   } finally {
     isSearching.value = false
+  }
+}
+
+async function handleTrackClick(track) {
+  if (!props.roomCode) {
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'warning',
+        message: 'Kein aktiver Raum vorhanden.',
+        timeout: 1500
+      })
+    }
+    return
+  }
+
+  try {
+    const updatedRoom = await addToQueue(props.roomCode, track)
+    emit('track-added', track)
+
+    if (typeof $q.notify === 'function') {
+      const wasInQueue = isInQueue(track.id)
+      $q.notify({
+        type: 'positive',
+        message: wasInQueue 
+          ? `Vote für "${track.name}" hinzugefügt!` 
+          : `"${track.name}" zur Party-Queue hinzugefügt!`,
+        timeout: 1500
+      })
+    }
+  } catch (err) {
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'negative',
+        message: err.message || 'Konnte Song nicht hinzufügen.',
+        timeout: 2000
+      })
+    }
   }
 }
 

@@ -140,17 +140,88 @@ export function useRoom() {
     }
   }
 
-  async function closeRoom(code) {
-    if (!code) return
+  async function addToQueue(code, track) {
+    if (!code || !track) return null
     try {
-      await fetch(`${API_BASE_URL}/api/rooms/${code.toUpperCase()}`, {
+      const res = await fetch(`${API_BASE_URL}/api/rooms/${code.toUpperCase()}/queue`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token.value ? { Authorization: `Bearer ${token.value}` } : {})
+        },
+        body: JSON.stringify({
+          track_id: track.id,
+          name: track.name,
+          uri: track.uri,
+          artist_display: track.artist_display,
+          album_name: track.album_name,
+          album_art: track.album_art,
+          duration_ms: track.duration_ms,
+          user_id: user.value?.id || guestId,
+          user_name: user.value?.display_name || 'Party Gast'
+        })
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Konnte Song nicht zur Queue hinzufügen.')
+      }
+
+      const room = await res.json()
+      currentRoom.value = room
+      return room
+    } catch (err) {
+      console.error('Failed to add to queue:', err)
+      throw err
+    }
+  }
+
+  async function voteTrack(code, trackId) {
+    if (!code || !trackId) return null
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/rooms/${code.toUpperCase()}/queue/${trackId}/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token.value ? { Authorization: `Bearer ${token.value}` } : {})
+        },
+        body: JSON.stringify({
+          user_id: user.value?.id || guestId
+        })
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Fehler beim Abstimmen.')
+      }
+
+      const room = await res.json()
+      currentRoom.value = room
+      return room
+    } catch (err) {
+      console.error('Failed to vote track:', err)
+      throw err
+    }
+  }
+
+  async function removeFromQueue(code, trackId) {
+    if (!code || !trackId) return null
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/rooms/${code.toUpperCase()}/queue/${trackId}`, {
         method: 'DELETE'
       })
-    } catch (e) {
-      console.warn('Error closing room:', e)
-    } finally {
-      localStorage.removeItem('party_host_room_' + code.toUpperCase())
-      currentRoom.value = null
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Konnte Song nicht entfernen.')
+      }
+
+      const room = await res.json()
+      currentRoom.value = room
+      return room
+    } catch (err) {
+      console.error('Failed to remove from queue:', err)
+      throw err
     }
   }
 
@@ -164,6 +235,9 @@ export function useRoom() {
     fetchRoom,
     joinRoom,
     leaveRoom,
-    closeRoom
+    closeRoom,
+    addToQueue,
+    voteTrack,
+    removeFromQueue
   }
 }

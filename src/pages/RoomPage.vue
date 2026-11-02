@@ -197,6 +197,9 @@
               </q-card-section>
             </q-card>
 
+            <!-- Live Party Queue with Voting -->
+            <PartyQueue :room-code="currentRoom.code" />
+
             <!-- Song Search -->
             <SongSearch :room-code="currentRoom.code" />
 
@@ -293,6 +296,7 @@ import QRCode from 'qrcode'
 import { useRoom } from '@/composables/useRoom'
 import { useAuth } from '@/composables/useAuth'
 import SongSearch from '@/components/SongSearch.vue'
+import PartyQueue from '@/components/PartyQueue.vue'
 
 const route = useRoute()
 const router = useRouter()
