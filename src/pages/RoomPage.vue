@@ -197,16 +197,8 @@
               </q-card-section>
             </q-card>
 
-            <!-- Party Queue Placeholder Card -->
-            <q-card class="bg-grey-10 text-white shadow-8" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
-              <q-card-section class="q-pa-lg text-center">
-                <q-icon name="playlist_play" size="48px" color="primary" class="q-mb-sm" />
-                <div class="text-h6 text-weight-bold">Gemeinsame Playlist & Queue</div>
-                <div class="text-body2 text-grey-4 q-mt-xs">
-                  Der Raum ist aktiv! Gäste können beitreten und Songs für die Party vorschlagen.
-                </div>
-              </q-card-section>
-            </q-card>
+            <!-- Song Search -->
+            <SongSearch :room-code="currentRoom.code" />
 
           </div>
 
@@ -300,6 +292,7 @@ import { useQuasar } from 'quasar'
 import QRCode from 'qrcode'
 import { useRoom } from '@/composables/useRoom'
 import { useAuth } from '@/composables/useAuth'
+import SongSearch from '@/components/SongSearch.vue'
 
 const route = useRoute()
 const router = useRouter()
