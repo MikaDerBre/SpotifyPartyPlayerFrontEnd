@@ -19,6 +19,7 @@
     "lint:check": "oxfmt --check && oxlint",
     "dev": "quasar dev",
     "build": "quasar build",
+    "build:static": "quasar build && node -e \"fs.cpSync('dist/spa', '../backend/static', { recursive: true, force: true })\"",
     "postinstall": "quasar prepare --silent"
   },
   "dependencies": {
