@@ -8,12 +8,19 @@ const isConfigured = ref(true)
 const isLoading = ref(false)
 const authError = ref('')
 
+let checkAuthPromise = null
+
 export function useAuth() {
   const isAuthenticated = computed(() => Boolean(token.value && user.value))
 
-  async function checkAuth() {
-    isLoading.value = true
-    authError.value = ''
+  function checkAuth() {
+    if (checkAuthPromise) {
+      return checkAuthPromise
+    }
+
+    checkAuthPromise = (async () => {
+      isLoading.value = true
+      authError.value = ''
 
     try {
       // 1. Check server status and whether Spotify credentials are configured
@@ -51,7 +58,11 @@ export function useAuth() {
       authError.value = 'Backend nicht erreichbar. Bitte stelle sicher, dass der Axum-Server läuft.'
     } finally {
       isLoading.value = false
+      checkAuthPromise = null
     }
+    })()
+
+    return checkAuthPromise
   }
 
   function login() {
