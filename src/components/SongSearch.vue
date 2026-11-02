@@ -166,7 +166,7 @@ async function executeSearch(query) {
   try {
     const params = new URLSearchParams({
       q: trimmed,
-      limit: '20'
+      limit: '10'
     })
     if (props.roomCode) {
       params.append('room_code', props.roomCode)
