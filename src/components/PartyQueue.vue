@@ -17,6 +17,67 @@
         </q-badge>
       </div>
 
+      <!-- Now Playing Section (Live Spotify Sync) -->
+      <div v-if="currentlyPlaying" class="now-playing-banner q-mb-lg q-pa-md bg-grey-9 text-white shadow-4" style="border-radius: 14px; border: 1px solid rgba(29, 185, 84, 0.35);">
+        <div class="row items-center justify-between q-mb-xs">
+          <div class="row items-center q-gutter-xs text-primary text-weight-bolder text-caption tracking-wider">
+            <q-icon :name="currentlyPlaying.is_playing ? 'graphic_eq' : 'pause_circle'" size="18px" />
+            <span>{{ currentlyPlaying.is_playing ? 'AKTUELL LÄUFT AUF SPOTIFY' : 'SPOTIFY PAUSIERT' }}</span>
+          </div>
+
+          <q-badge
+            v-if="currentlyPlaying.is_playing && remainingSeconds <= 12 && remainingSeconds > 0"
+            color="orange-9"
+            text-color="white"
+            class="text-weight-bold pulse-badge q-px-sm q-py-xs"
+          >
+            <q-icon name="sync" class="rotate-sync q-mr-xs" />
+            Übergang aktiv (&le; 12s)
+          </q-badge>
+          <q-badge
+            v-else-if="currentlyPlaying.is_playing"
+            color="grey-8"
+            text-color="grey-3"
+            class="text-weight-medium q-px-sm q-py-xs"
+          >
+            Noch {{ formatDuration(currentlyPlaying.remaining_ms) }}
+          </q-badge>
+        </div>
+
+        <div class="row items-center no-wrap q-mt-sm">
+          <q-avatar rounded size="56px" class="bg-grey-8 shadow-3 q-mr-md">
+            <img v-if="currentlyPlaying.album_art" :src="currentlyPlaying.album_art" :alt="currentlyPlaying.name" />
+            <q-icon v-else name="album" color="grey-5" />
+          </q-avatar>
+
+          <div class="column justify-center ellipsis" style="flex: 1;">
+            <div class="text-subtitle1 text-weight-bolder ellipsis text-white">{{ currentlyPlaying.name }}</div>
+            <div class="text-caption text-grey-4 ellipsis">{{ currentlyPlaying.artist_display }}</div>
+            <div class="text-caption text-grey-5 ellipsis">{{ currentlyPlaying.album_name }}</div>
+          </div>
+        </div>
+
+        <!-- Live Progress Bar -->
+        <div class="q-mt-sm">
+          <q-linear-progress
+            :value="progressRatio"
+            color="primary"
+            track-color="grey-8"
+            rounded
+            size="6px"
+          />
+          <div class="row justify-between text-caption text-grey-4 q-mt-xs">
+            <span>{{ formatDuration(currentlyPlaying.progress_ms) }}</span>
+            <span>-{{ formatDuration(currentlyPlaying.remaining_ms) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="isHost" class="q-mb-md q-pa-sm bg-grey-9 text-grey-4 text-caption row items-center q-gutter-x-sm" style="border-radius: 10px; border: 1px dashed rgba(255, 255, 255, 0.15);">
+        <q-icon name="info" color="grey-5" size="18px" />
+        <span>Host-Info: Starte die Musik auf Spotify – sobald ein Song läuft, wird der nächste #1 Song &le; 12s vor Ende automatisch in die Warteschlange gereiht.</span>
+      </div>
+
       <!-- Queue is Empty -->
       <div v-if="!queue.length" class="column items-center q-py-xl text-center text-grey-5">
         <q-icon name="queue_music" size="56px" class="q-mb-sm text-grey-7" />
@@ -138,6 +199,15 @@ const { user } = useAuth()
 const { currentRoom, isHost, guestId, voteTrack, removeFromQueue } = useRoom()
 
 const queue = computed(() => currentRoom.value?.queue || [])
+const currentlyPlaying = computed(() => currentRoom.value?.currently_playing)
+const remainingSeconds = computed(() => {
+  if (!currentlyPlaying.value?.remaining_ms) return 0
+  return Math.ceil(currentlyPlaying.value.remaining_ms / 1000)
+})
+const progressRatio = computed(() => {
+  if (!currentlyPlaying.value || !currentlyPlaying.value.duration_ms) return 0
+  return Math.min(1, Math.max(0, currentlyPlaying.value.progress_ms / currentlyPlaying.value.duration_ms))
+})
 
 const currentUserId = computed(() => user.value?.id || guestId)
 
@@ -214,5 +284,21 @@ function formatDuration(ms) {
 /* Animations for queue reordering */
 .queue-flip-move {
   transition: transform 0.4s ease;
+}
+
+.pulse-badge {
+  animation: pulse-glow 1.5s infinite;
+}
+@keyframes pulse-glow {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 124, 0, 0.7); }
+  50% { transform: scale(1.04); box-shadow: 0 0 0 6px rgba(245, 124, 0, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 124, 0, 0); }
+}
+
+.rotate-sync {
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
 }
 </style>

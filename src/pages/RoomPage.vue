@@ -453,12 +453,12 @@ onMounted(async () => {
     console.warn('Room fetch error:', e)
   }
 
-  // Poll room updates every 5 seconds for real-time member updates
+  // Poll room updates every 2.5 seconds for real-time player and queue sync
   pollInterval = setInterval(async () => {
     if (currentRoom.value && !showJoinDialog.value) {
       await fetchRoom(route.params.code)
     }
-  }, 5000)
+  }, 2500)
 })
 
 onUnmounted(() => {
