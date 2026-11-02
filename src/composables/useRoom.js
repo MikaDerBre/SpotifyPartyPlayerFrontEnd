@@ -52,7 +52,6 @@ export function useRoom() {
       const room = await res.json()
       currentRoom.value = room
       localStorage.setItem('party_host_room_' + room.code, 'true')
-      localStorage.setItem('party_last_room', room.code)
       return room
     } catch (err) {
       console.error('Failed to create room:', err)
@@ -113,7 +112,6 @@ export function useRoom() {
 
       const room = await res.json()
       currentRoom.value = room
-      localStorage.setItem('party_last_room', room.code)
       return room
     } catch (err) {
       console.error('Failed to join room:', err)
@@ -137,7 +135,6 @@ export function useRoom() {
     } catch (e) {
       console.warn('Error leaving room:', e)
     } finally {
-      localStorage.removeItem('party_last_room')
       localStorage.removeItem('party_host_room_' + code.toUpperCase())
       currentRoom.value = null
     }
@@ -152,7 +149,6 @@ export function useRoom() {
     } catch (e) {
       console.warn('Error closing room:', e)
     } finally {
-      localStorage.removeItem('party_last_room')
       localStorage.removeItem('party_host_room_' + code.toUpperCase())
       currentRoom.value = null
     }

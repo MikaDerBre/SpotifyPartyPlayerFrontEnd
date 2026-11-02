@@ -33,18 +33,6 @@
         </template>
       </q-banner>
 
-      <!-- Active Room Quick Resume Banner if user was already in a room -->
-      <q-banner v-if="lastRoomCode" rounded class="bg-grey-9 text-white q-mb-lg shadow-4" style="border: 1px solid rgba(29, 185, 84, 0.4);">
-        <template #avatar>
-          <q-icon name="meeting_room" color="primary" size="28px" />
-        </template>
-        <div class="text-weight-bold">Zuletzt besuchter Raum: <span class="text-primary">{{ lastRoomCode }}</span></div>
-        <div class="text-caption text-grey-4">Möchtest du wieder in deinen aktiven Party-Raum zurückkehren?</div>
-        <template #action>
-          <q-btn flat color="primary" label="Zum Raum" :to="`/room/${lastRoomCode}`" />
-        </template>
-      </q-banner>
-
       <!-- LOGGED IN VIEW -->
       <div v-if="isAuthenticated && user" class="column q-gutter-lg">
         <!-- User Card -->
@@ -339,7 +327,6 @@ const showJoinDialog = ref(false)
 const newRoomName = ref('')
 const joinRoomCode = ref('')
 const joinNickname = ref('')
-const lastRoomCode = ref('')
 
 async function handleCreateRoom() {
   try {
@@ -407,7 +394,6 @@ async function handleJoinRoom() {
 
 onMounted(() => {
   checkAuth()
-  lastRoomCode.value = localStorage.getItem('party_last_room') || ''
 })
 </script>
 
