@@ -1,33 +1,45 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="lHh Lpr lFf" class="bg-black text-white">
+    <q-header elevated class="bg-grey-10 text-white q-py-xs" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
       <q-toolbar>
+        <q-avatar size="38px" class="bg-primary text-black q-mr-sm">
+          <q-icon name="music_note" size="24px" />
+        </q-avatar>
+
+        <q-toolbar-title class="text-weight-bold row items-center no-wrap">
+          <span>PartyPlayer</span>
+          <q-badge color="primary" text-color="black" label="Spotify" class="q-ml-sm text-bold" />
+        </q-toolbar-title>
+
+        <q-space />
+
+        <!-- User profile in header if logged in -->
+        <div v-if="isAuthenticated && user" class="row items-center q-gutter-sm">
+          <q-avatar size="34px" class="shadow-2">
+            <img v-if="user.images && user.images.length" :src="user.images[0].url" :alt="user.display_name || 'User'" />
+            <q-icon v-else name="person" />
+          </q-avatar>
+          <span class="text-subtitle2 gt-xs text-weight-medium">{{ user.display_name || 'Spotify User' }}</span>
+          <q-btn flat round dense icon="logout" color="grey-4" @click="logout">
+            <q-tooltip>Abmelden</q-tooltip>
+          </q-btn>
+        </div>
+
+        <!-- Login button in header if not logged in -->
         <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
+          v-else-if="!isLoading"
+          unelevated
+          rounded
+          color="primary"
+          text-color="black"
+          icon="login"
+          label="Anmelden"
+          class="text-weight-bold"
+          no-caps
+          @click="login"
         />
-
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
-
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.label"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
 
     <q-page-container>
       <router-view />
@@ -36,57 +48,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import EssentialLink from '@/components/EssentialLink.vue'
+import { onMounted } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
-const linksList = [
-  {
-    label: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    label: 'GitHub',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    label: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    label: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    label: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    label: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    label: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
+const { user, isAuthenticated, isLoading, login, logout, checkAuth } = useAuth()
 
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
+onMounted(() => {
+  checkAuth()
+})
 </script>
+
+<style scoped>
+.q-layout {
+  min-height: 100vh;
+}
+</style>
