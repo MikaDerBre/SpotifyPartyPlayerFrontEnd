@@ -25,7 +25,7 @@
           <ul class="q-my-xs q-pl-md text-caption">
             <li><b>SPOTIFY_CLIENT_ID</b>: Client ID aus deinem Spotify Dashboard</li>
             <li><b>SPOTIFY_CLIENT_SECRET</b>: Client Secret aus deinem Spotify Dashboard</li>
-            <li><b>Redirect URI im Spotify Dashboard</b>: <code>http://127.0.0.1:3000/api/auth/spotify/callback</code></li>
+            <li><b>Redirect URI im Spotify Dashboard</b>: <code>http://127.0.0.1:3000/auth/callback</code></li>
           </ul>
         </div>
         <template #action>
