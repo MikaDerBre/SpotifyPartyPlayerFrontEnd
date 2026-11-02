@@ -1,89 +1,91 @@
 <template>
   <q-card class="bg-grey-10 text-white shadow-8" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
-    <q-card-section class="q-pa-lg">
-      <div class="row items-center justify-between q-mb-md">
-        <div class="row items-center q-gutter-sm">
-          <q-avatar size="36px" class="bg-primary text-black">
-            <q-icon name="format_list_numbered" size="22px" />
+    <q-card-section class="q-pa-sm q-pa-sm-md">
+      <div class="row items-center justify-between q-mb-sm">
+        <div class="row items-center q-gutter-xs q-gutter-sm-sm">
+          <q-avatar :size="$q.screen.lt.sm ? '30px' : '36px'" class="bg-primary text-black">
+            <q-icon name="format_list_numbered" :size="$q.screen.lt.sm ? '18px' : '22px'" />
           </q-avatar>
           <div>
-            <div class="text-h6 text-weight-bold">Party-Queue</div>
+            <div class="text-subtitle1 text-sm-h6 text-weight-bold">Party-Queue</div>
             <div class="text-caption text-grey-4">Sortiert nach den meisten Stimmen</div>
           </div>
         </div>
 
-        <q-badge color="grey-8" class="text-bold text-subtitle2 q-px-sm q-py-xs">
+        <q-badge color="grey-8" class="text-bold text-caption text-sm-subtitle2 q-px-sm q-py-xs">
           {{ queue.length }} {{ queue.length === 1 ? 'Song' : 'Songs' }}
         </q-badge>
       </div>
 
       <!-- Now Playing Section (Live Spotify Sync) -->
-      <div v-if="currentlyPlaying" class="now-playing-banner q-mb-lg q-pa-md bg-grey-9 text-white shadow-4" style="border-radius: 14px; border: 1px solid rgba(29, 185, 84, 0.35);">
+      <div v-if="currentlyPlaying" class="now-playing-banner q-mb-md q-pa-sm q-pa-sm-md bg-grey-9 text-white shadow-4" style="border-radius: 14px; border: 1px solid rgba(29, 185, 84, 0.35);">
         <div class="row items-center justify-between q-mb-xs">
           <div class="row items-center q-gutter-xs text-primary text-weight-bolder text-caption tracking-wider">
-            <q-icon :name="currentlyPlaying.is_playing ? 'graphic_eq' : 'pause_circle'" size="18px" />
-            <span>{{ currentlyPlaying.is_playing ? 'AKTUELL LÄUFT AUF SPOTIFY' : 'SPOTIFY PAUSIERT' }}</span>
+            <q-icon :name="currentlyPlaying.is_playing ? 'graphic_eq' : 'pause_circle'" size="16px" />
+            <span style="font-size: 11px;">{{ currentlyPlaying.is_playing ? 'LIVE AUF SPOTIFY' : 'SPOTIFY PAUSIERT' }}</span>
           </div>
 
           <q-badge
             v-if="currentlyPlaying.is_playing && remainingSeconds <= 12 && remainingSeconds > 0"
             color="orange-9"
             text-color="white"
-            class="text-weight-bold pulse-badge q-px-sm q-py-xs"
+            class="text-weight-bold pulse-badge q-px-xs q-py-xs"
+            style="font-size: 10px;"
           >
-            <q-icon name="sync" class="rotate-sync q-mr-xs" />
-            Übergang aktiv (&le; 12s)
+            <q-icon name="sync" class="rotate-sync q-mr-xs" size="12px" />
+            Übergang (&le; 12s)
           </q-badge>
           <q-badge
             v-else-if="currentlyPlaying.is_playing"
             color="grey-8"
             text-color="grey-3"
-            class="text-weight-medium q-px-sm q-py-xs"
+            class="text-weight-medium q-px-xs q-py-xs"
+            style="font-size: 10px;"
           >
             Noch {{ formatDuration(currentlyPlaying.remaining_ms) }}
           </q-badge>
         </div>
 
-        <div class="row items-center no-wrap q-mt-sm">
-          <q-avatar rounded size="56px" class="bg-grey-8 shadow-3 q-mr-md">
+        <div class="row items-center no-wrap q-mt-xs">
+          <q-avatar rounded :size="$q.screen.lt.sm ? '46px' : '56px'" class="bg-grey-8 shadow-3 q-mr-sm flex-shrink-0">
             <img v-if="currentlyPlaying.album_art" :src="currentlyPlaying.album_art" :alt="currentlyPlaying.name" />
             <q-icon v-else name="album" color="grey-5" />
           </q-avatar>
 
-          <div class="column justify-center ellipsis" style="flex: 1;">
-            <div class="text-subtitle1 text-weight-bolder ellipsis text-white">{{ currentlyPlaying.name }}</div>
+          <div class="column justify-center ellipsis" style="flex: 1; min-width: 0;">
+            <div class="text-subtitle2 text-sm-subtitle1 text-weight-bolder ellipsis text-white">{{ currentlyPlaying.name }}</div>
             <div class="text-caption text-grey-4 ellipsis">{{ currentlyPlaying.artist_display }}</div>
             <div class="text-caption text-grey-5 ellipsis">{{ currentlyPlaying.album_name }}</div>
           </div>
         </div>
 
         <!-- Live Progress Bar -->
-        <div class="q-mt-sm">
+        <div class="q-mt-xs">
           <q-linear-progress
             :value="progressRatio"
             color="primary"
             track-color="grey-8"
             rounded
-            size="6px"
+            size="5px"
           />
-          <div class="row justify-between text-caption text-grey-4 q-mt-xs">
+          <div class="row justify-between text-caption text-grey-4 q-mt-xs" style="font-size: 11px;">
             <span>{{ formatDuration(currentlyPlaying.progress_ms) }}</span>
             <span>-{{ formatDuration(currentlyPlaying.remaining_ms) }}</span>
           </div>
         </div>
       </div>
 
-      <div v-else-if="isHost" class="q-mb-md q-pa-sm bg-grey-9 text-grey-4 text-caption row items-center q-gutter-x-sm" style="border-radius: 10px; border: 1px dashed rgba(255, 255, 255, 0.15);">
-        <q-icon name="info" color="grey-5" size="18px" />
-        <span>Host-Info: Starte die Musik auf Spotify – sobald ein Song läuft, wird der nächste #1 Song &le; 12s vor Ende automatisch in die Warteschlange gereiht.</span>
+      <div v-else-if="isHost" class="q-mb-sm q-pa-xs bg-grey-9 text-grey-4 text-caption row items-center q-gutter-x-xs" style="border-radius: 8px; border: 1px dashed rgba(255, 255, 255, 0.15); font-size: 11px;">
+        <q-icon name="info" color="grey-5" size="16px" />
+        <span>Starte Musik auf Spotify – Song #1 wird &le; 12s vor Ende automatisch eingereiht.</span>
       </div>
 
       <!-- Queue is Empty -->
-      <div v-if="!queue.length" class="column items-center q-py-xl text-center text-grey-5">
-        <q-icon name="queue_music" size="56px" class="q-mb-sm text-grey-7" />
-        <div class="text-h6 text-weight-medium text-grey-4">Die Queue ist noch leer</div>
-        <div class="text-caption text-grey-6 q-mt-xs" style="max-width: 380px;">
-          Suche oben nach Songs und klicke sie an, um sie zur Party-Queue hinzuzufügen. Jeder kann für seine Favoriten voten!
+      <div v-if="!queue.length" class="column items-center q-py-lg text-center text-grey-5">
+        <q-icon name="queue_music" size="48px" class="q-mb-xs text-grey-7" />
+        <div class="text-subtitle1 text-weight-medium text-grey-4">Die Queue ist noch leer</div>
+        <div class="text-caption text-grey-6 q-mt-xs" style="max-width: 320px;">
+          Suche unten nach Songs und füge deine Favoriten hinzu!
         </div>
       </div>
 
@@ -93,70 +95,72 @@
           <q-item
             v-for="(track, index) in queue"
             :key="track.id"
-            class="q-py-md queue-item"
+            class="q-py-xs q-py-sm-sm q-px-xs q-px-sm-sm queue-item"
             :class="{ 'first-place': index === 0 }"
           >
             <!-- Rank Badge -->
-            <q-item-section avatar style="min-width: 44px;" class="q-pr-sm items-center">
+            <q-item-section avatar :style="{ minWidth: $q.screen.lt.sm ? '28px' : '40px' }" class="q-pr-xs items-center">
               <template v-if="index === 0">
-                <q-avatar size="32px" color="primary" text-color="black" class="text-weight-bolder shadow-3">
+                <q-avatar :size="$q.screen.lt.sm ? '24px' : '30px'" color="primary" text-color="black" class="text-weight-bolder shadow-2" style="font-size: 12px;">
                   #1
                 </q-avatar>
               </template>
               <template v-else>
-                <span class="text-weight-bold text-subtitle1 text-grey-5">
+                <span class="text-weight-bold text-caption text-grey-5">
                   #{{ index + 1 }}
                 </span>
               </template>
             </q-item-section>
 
             <!-- Album Cover -->
-            <q-item-section avatar>
-              <q-avatar rounded size="52px" class="bg-grey-8 shadow-2">
+            <q-item-section avatar class="q-pr-xs">
+              <q-avatar rounded :size="$q.screen.lt.sm ? '42px' : '50px'" class="bg-grey-8 shadow-2 flex-shrink-0">
                 <img v-if="track.album_art" :src="track.album_art" :alt="track.name" />
                 <q-icon v-else name="album" color="grey-5" />
               </q-avatar>
             </q-item-section>
 
             <!-- Track Info -->
-            <q-item-section>
-              <div class="row items-center no-wrap">
-                <span class="text-subtitle1 text-weight-bold ellipsis text-white">{{ track.name }}</span>
+            <q-item-section style="min-width: 0; flex: 1;">
+              <div class="row items-center no-wrap ellipsis">
+                <span class="text-body2 text-sm-subtitle1 text-weight-bold ellipsis text-white">{{ track.name }}</span>
                 <q-badge
                   v-if="index === 0"
                   color="primary"
                   text-color="black"
-                  label="NEXT UP"
-                  class="q-ml-sm text-bold"
-                  style="font-size: 10px;"
+                  label="NEXT"
+                  class="q-ml-xs text-bold"
+                  style="font-size: 9px; padding: 1px 3px;"
                 />
               </div>
 
-              <div class="text-caption text-grey-4 ellipsis q-mt-xs">
+              <div class="text-caption text-grey-4 ellipsis">
                 {{ track.artist_display }}
               </div>
 
-              <div class="row items-center q-gutter-x-sm text-caption text-grey-5 q-mt-xs">
+              <div class="row items-center q-gutter-x-xs text-caption text-grey-5 ellipsis" style="font-size: 11px;">
                 <span>{{ formatDuration(track.duration_ms) }}</span>
                 <span>•</span>
-                <span>von <b class="text-grey-4">{{ track.added_by_name }}</b></span>
+                <span class="ellipsis">von <b class="text-grey-4">{{ track.added_by_name }}</b></span>
               </div>
             </q-item-section>
 
             <!-- Vote Button & Actions -->
-            <q-item-section side class="row items-center no-wrap q-gutter-x-sm">
+            <q-item-section side class="row items-center no-wrap q-gutter-x-xs q-pl-xs">
               <!-- Upvote Button -->
               <q-btn
                 unelevated
                 rounded
                 :color="hasVoted(track) ? 'primary' : 'grey-8'"
                 :text-color="hasVoted(track) ? 'black' : 'white'"
-                class="text-weight-bolder q-px-md"
+                class="text-weight-bolder"
+                :class="$q.screen.lt.sm ? 'q-px-xs q-py-xs' : 'q-px-sm q-py-xs'"
+                size="sm"
                 no-caps
                 @click="handleVote(track)"
               >
-                <q-icon name="thumb_up" size="18px" class="q-mr-xs" />
-                <span style="font-size: 15px;">{{ track.votes }}</span>
+                <q-icon name="thumb_up" :size="$q.screen.lt.sm ? '14px' : '16px'" class="q-mr-xs" />
+                <span :style="{ fontSize: $q.screen.lt.sm ? '12px' : '14px' }">{{ track.votes }}</span>
                 <q-tooltip>{{ hasVoted(track) ? 'Du hast bereits gevotet' : 'Diesen Song nach oben voten' }}</q-tooltip>
               </q-btn>
 
@@ -166,6 +170,7 @@
                 flat
                 round
                 dense
+                size="sm"
                 icon="delete_outline"
                 color="grey-5"
                 @click="handleRemove(track)"
