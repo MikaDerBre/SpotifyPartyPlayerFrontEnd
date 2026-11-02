@@ -1,9 +1,9 @@
 <template>
   <q-card class="bg-grey-10 text-white shadow-8" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
-    <q-card-section class="q-pa-sm q-pa-sm-md">
-      <div class="row items-center justify-between q-mb-sm">
-        <div class="text-subtitle1 text-sm-h6 text-weight-bold row items-center">
-          <q-icon name="search" color="primary" class="q-mr-xs" :size="$q.screen.lt.sm ? '22px' : '26px'" />
+    <q-card-section class="q-pa-md q-pa-md-lg">
+      <div class="row items-center justify-between q-mb-md">
+        <div class="text-h6 text-weight-bold row items-center">
+          <q-icon name="search" color="primary" class="q-mr-sm" size="26px" />
           Song-Suche
         </div>
         <div v-if="tracks.length" class="text-caption text-grey-4">
@@ -32,34 +32,34 @@
       </q-input>
 
       <!-- RESULTS LIST -->
-      <div class="q-mt-sm">
+      <div class="q-mt-md">
 
         <!-- Loading spinner -->
-        <div v-if="isSearching" class="column items-center q-py-md q-gutter-xs">
+        <div v-if="isSearching" class="column items-center q-py-lg q-gutter-sm">
           <q-spinner-dots color="primary" size="36px" />
           <div class="text-caption text-grey-4">Suche auf Spotify...</div>
         </div>
 
         <!-- Search Error -->
-        <q-banner v-else-if="errorMessage" rounded class="bg-red-9 text-white q-my-xs q-pa-sm">
+        <q-banner v-else-if="errorMessage" rounded class="bg-red-9 text-white q-my-sm q-pa-sm">
           <template #avatar>
             <q-icon name="warning" size="20px" />
           </template>
-          <span style="font-size: 12px;">{{ errorMessage }}</span>
+          <span>{{ errorMessage }}</span>
         </q-banner>
 
         <!-- Results Found -->
-        <q-list v-else-if="tracks.length" separator class="q-mt-xs bg-grey-9" style="border-radius: 12px; max-height: 420px; overflow-y: auto;">
+        <q-list v-else-if="tracks.length" separator class="q-mt-sm bg-grey-9" style="border-radius: 12px; max-height: 440px; overflow-y: auto;">
           <q-item
             v-for="track in tracks"
             :key="track.id"
-            class="q-py-xs q-px-xs track-item"
+            class="q-py-sm q-px-md track-item"
             clickable
             @click="handleTrackClick(track)"
           >
             <!-- Album Cover -->
-            <q-item-section avatar class="q-pr-xs">
-              <q-avatar rounded :size="$q.screen.lt.sm ? '40px' : '48px'" class="bg-grey-8 shadow-2 flex-shrink-0">
+            <q-item-section avatar class="q-pr-sm">
+              <q-avatar rounded size="48px" class="bg-grey-8 shadow-2 flex-shrink-0">
                 <img v-if="track.album_art" :src="track.album_art" :alt="track.name" />
                 <q-icon v-else name="album" color="grey-5" />
               </q-avatar>
@@ -67,7 +67,7 @@
 
             <!-- Title & Artist -->
             <q-item-section style="min-width: 0; flex: 1;">
-              <q-item-label class="text-weight-bold text-caption text-sm-subtitle2 text-white row items-center no-wrap ellipsis">
+              <q-item-label class="text-weight-bold text-subtitle2 text-white row items-center no-wrap ellipsis">
                 <span class="ellipsis">{{ track.name }}</span>
                 <q-badge
                   v-if="track.explicit"
@@ -78,39 +78,40 @@
                   style="font-size: 9px; padding: 1px 3px;"
                 />
               </q-item-label>
-              <q-item-label caption class="text-grey-4 ellipsis" style="font-size: 11px;">
+              <q-item-label caption class="text-grey-4 ellipsis q-mt-xs">
                 {{ track.artist_display }}
               </q-item-label>
-              <q-item-label caption class="text-grey-6 ellipsis text-caption" style="font-size: 10px;">
+              <q-item-label caption class="text-grey-6 ellipsis text-caption">
                 {{ track.album_name }}
               </q-item-label>
             </q-item-section>
 
             <!-- Action / In Queue Status -->
-            <q-item-section side class="row items-center no-wrap q-gutter-x-xs q-pl-xs">
-              <span class="text-caption text-grey-5 gt-xs" style="font-size: 11px;">{{ formatDuration(track.duration_ms) }}</span>
+            <q-item-section side class="q-pl-sm">
+              <div class="row items-center no-wrap q-gutter-x-sm">
+                <span class="text-caption text-grey-5 gt-xs">{{ formatDuration(track.duration_ms) }}</span>
 
-              <template v-if="isInQueue(track.id)">
-                <q-badge color="positive" text-color="black" class="q-py-xs q-px-xs text-bold" style="font-size: 10px;">
-                  <q-icon name="check" size="13px" />
-                  <span class="gt-xs q-ml-xs">In Queue</span>
-                  <span class="q-ml-xs">({{ getQueueVotes(track.id) }})</span>
-                </q-badge>
-              </template>
+                <template v-if="isInQueue(track.id)">
+                  <q-badge color="positive" text-color="black" class="q-py-xs q-px-sm text-bold" style="font-size: 11px; border-radius: 6px;">
+                    <q-icon name="check" size="13px" class="q-mr-xs" />
+                    <span class="gt-xs">In Queue </span>({{ getQueueVotes(track.id) }})
+                  </q-badge>
+                </template>
 
-              <template v-else>
-                <q-btn
-                  round
-                  dense
-                  unelevated
-                  size="sm"
-                  color="primary"
-                  text-color="black"
-                  icon="add"
-                >
-                  <q-tooltip>Zur Party-Queue hinzufügen</q-tooltip>
-                </q-btn>
-              </template>
+                <template v-else>
+                  <q-btn
+                    round
+                    dense
+                    unelevated
+                    size="sm"
+                    color="primary"
+                    text-color="black"
+                    icon="add"
+                  >
+                    <q-tooltip>Zur Party-Queue hinzufügen</q-tooltip>
+                  </q-btn>
+                </template>
+              </div>
             </q-item-section>
           </q-item>
         </q-list>

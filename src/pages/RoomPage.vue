@@ -24,48 +24,49 @@
       </div>
 
       <!-- ROOM CONTENT -->
-      <div v-else-if="currentRoom" class="column q-gutter-sm q-gutter-sm-md">
+      <div v-else-if="currentRoom" class="column q-gutter-lg">
 
         <!-- Top Header Card -->
         <q-card class="bg-grey-10 text-white shadow-8" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
-          <q-card-section class="q-pa-sm q-pa-sm-md">
-            <div class="row items-center justify-between no-wrap q-gutter-x-sm">
+          <q-card-section class="q-pa-md q-pa-md-lg">
+            <div class="row items-center justify-between q-col-gutter-sm">
               <!-- Left info: Icon, Name, Host -->
-              <div class="row items-center no-wrap q-gutter-x-sm ellipsis" style="min-width: 0; flex: 1;">
-                <q-avatar :size="$q.screen.lt.sm ? '40px' : '52px'" class="bg-primary text-black flex-shrink-0">
-                  <q-icon name="celebration" :size="$q.screen.lt.sm ? '22px' : '28px'" />
+              <div class="row items-center no-wrap q-gutter-md ellipsis col-12 col-sm-auto" style="min-width: 0;">
+                <q-avatar size="50px" class="bg-primary text-black flex-shrink-0">
+                  <q-icon name="celebration" size="28px" />
                 </q-avatar>
                 <div class="ellipsis" style="min-width: 0;">
-                  <div class="row items-center q-gutter-xs no-wrap ellipsis">
-                    <span class="text-subtitle1 text-sm-h5 text-weight-bolder ellipsis">{{ currentRoom.name }}</span>
-                    <q-badge color="positive" class="text-bold" label="LIVE" style="font-size: 10px;" />
+                  <div class="row items-center q-gutter-sm no-wrap ellipsis">
+                    <span class="text-h5 text-weight-bolder ellipsis">{{ currentRoom.name }}</span>
+                    <q-badge color="positive" class="text-bold" label="LIVE" style="font-size: 11px;" />
                     <q-badge
                       v-if="isHost"
                       color="amber-9"
                       text-color="black"
                       class="text-bold"
                       label="HOST"
-                      style="font-size: 10px;"
+                      style="font-size: 11px;"
                     />
                   </div>
-                  <div class="text-caption text-grey-4 ellipsis q-mt-xs">
+                  <div class="text-body2 text-grey-4 ellipsis q-mt-xs">
                     Host: <b class="text-white">{{ currentRoom.host_name }}</b>
-                    <span class="q-mx-xs">•</span>
-                    <span><q-icon name="group" size="14px" class="q-mr-xs" />{{ currentRoom.member_count }} Gäste</span>
+                    <span class="q-mx-sm">•</span>
+                    <span><q-icon name="group" size="16px" class="q-mr-xs" />{{ currentRoom.member_count }} Gäste</span>
                   </div>
                 </div>
               </div>
 
               <!-- Action Buttons -->
-              <div class="row items-center q-gutter-xs flex-shrink-0">
+              <div class="row items-center q-gutter-sm col-12 col-sm-auto justify-end q-mt-xs q-mt-sm-none flex-shrink-0">
                 <q-btn
                   v-if="isHost"
+                  unelevated
+                  rounded
                   color="primary"
                   text-color="black"
                   icon="qr_code_2"
-                  :label="$q.screen.lt.sm ? 'QR' : 'Beamer-QR'"
-                  size="sm"
-                  class="text-weight-bold"
+                  label="Beamer-QR"
+                  class="text-weight-bold q-px-md"
                   no-caps
                   @click="showFullscreenQR = true"
                 >
@@ -74,10 +75,11 @@
                 <q-btn
                   v-if="isHost"
                   outline
+                  rounded
                   color="negative"
                   icon="close"
-                  :label="$q.screen.lt.sm ? '' : 'Beenden'"
-                  size="sm"
+                  label="Raum beenden"
+                  class="text-weight-bold q-px-md"
                   no-caps
                   @click="handleCloseRoom"
                 >
@@ -86,10 +88,11 @@
                 <q-btn
                   v-else
                   outline
+                  rounded
                   color="grey-4"
                   icon="logout"
-                  :label="$q.screen.lt.sm ? '' : 'Verlassen'"
-                  size="sm"
+                  label="Raum verlassen"
+                  class="text-weight-bold q-px-md"
                   no-caps
                   @click="handleLeaveRoom"
                 >
@@ -101,12 +104,12 @@
         </q-card>
 
         <!-- Main Responsive Grid:
-             On mobile (< md): PartyQueue & SongSearch FIRST.
-             On desktop (>= md): QR Code on the Left, Queue/Search on the Right. -->
-        <div class="row q-col-gutter-sm q-col-gutter-md-md">
+             Left: Party-Queue & Song-Suche (col-md-7)
+             Right: QR-Code & Party-Gäste (col-md-5) -->
+        <div class="row q-col-gutter-lg">
 
-          <!-- Main Content: Queue & Search (First on mobile, right column on desktop) -->
-          <div class="col-12 col-md-7 column q-gutter-sm q-gutter-md-md">
+          <!-- Left Column: Party Queue & Song Search -->
+          <div class="col-12 col-md-7 column q-gutter-lg">
             <!-- Live Party Queue with Voting & Currently Playing -->
             <PartyQueue :room-code="currentRoom.code" />
 
@@ -114,38 +117,38 @@
             <SongSearch :room-code="currentRoom.code" />
           </div>
 
-          <!-- Sidebar: QR Code & Guest List (Second on mobile, left column on desktop) -->
-          <div class="col-12 col-md-5 column q-gutter-sm q-gutter-md-md order-last order-md-first">
+          <!-- Right Column: QR Code & Guest List -->
+          <div class="col-12 col-md-5 column q-gutter-lg">
 
             <!-- QR Code & Share Card -->
-            <q-card class="bg-grey-10 text-white shadow-8 text-center q-pa-sm q-pa-sm-md" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
-              <div class="text-subtitle2 text-sm-subtitle1 text-weight-bold q-mb-xs">
-                <q-icon name="qr_code" color="primary" class="q-mr-xs" />
+            <q-card class="bg-grey-10 text-white shadow-8 text-center q-pa-md q-pa-md-lg" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="text-subtitle1 text-weight-bold q-mb-xs">
+                <q-icon name="qr_code" color="primary" class="q-mr-xs" size="20px" />
                 Mit Freunden teilen
               </div>
-              <div class="text-caption text-grey-4 q-mb-sm">
+              <div class="text-caption text-grey-4 q-mb-md">
                 Gäste können diesen QR-Code scannen, um der Party beizutreten.
               </div>
 
               <!-- QR Code Display -->
-              <div class="flex flex-center q-my-xs">
-                <div class="bg-white q-pa-xs shadow-4" style="border-radius: 12px; display: inline-block;">
+              <div class="flex flex-center q-my-sm">
+                <div class="bg-white q-pa-sm shadow-6" style="border-radius: 12px; display: inline-block;">
                   <img
                     v-if="qrCodeUrl"
                     :src="qrCodeUrl"
                     alt="Party Room QR Code"
-                    style="max-width: 180px; width: 100%; height: auto; aspect-ratio: 1; display: block;"
+                    style="width: 200px; height: 200px; display: block;"
                   />
-                  <q-spinner-dots v-else color="primary" size="36px" />
+                  <q-spinner-dots v-else color="primary" size="40px" />
                 </div>
               </div>
 
               <!-- Room Code Box -->
-              <div class="q-mt-sm q-pa-xs bg-grey-9 text-center" style="border-radius: 10px; border: 1px dashed rgba(255, 255, 255, 0.2);">
+              <div class="q-mt-md q-pa-sm bg-grey-9 text-center" style="border-radius: 12px; border: 1px dashed rgba(255, 255, 255, 0.2);">
                 <div class="text-caption text-grey-4">Code zum Beitreten:</div>
-                <div class="row items-center justify-center q-gutter-xs q-mt-xs">
-                  <span class="text-h5 text-sm-h4 text-weight-bolder text-primary tracking-widest">{{ currentRoom.code }}</span>
-                  <q-btn flat round dense size="sm" icon="content_copy" color="white" @click="copyRoomCode">
+                <div class="row items-center justify-center q-gutter-sm q-mt-xs">
+                  <span class="text-h4 text-weight-bolder text-primary tracking-widest">{{ currentRoom.code }}</span>
+                  <q-btn flat round dense icon="content_copy" color="white" @click="copyRoomCode">
                     <q-tooltip>Code kopieren</q-tooltip>
                   </q-btn>
                 </div>
@@ -155,10 +158,9 @@
               <q-btn
                 outline
                 color="primary"
-                class="full-width q-mt-sm text-weight-bold"
+                class="full-width q-mt-md text-weight-bold"
                 icon="share"
                 label="Einladungslink kopieren"
-                size="sm"
                 no-caps
                 @click="copyJoinLink"
               />
@@ -166,46 +168,46 @@
 
             <!-- Member List Card -->
             <q-card class="bg-grey-10 text-white shadow-8" style="border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
-              <q-card-section class="q-pa-sm q-pa-sm-md">
-                <div class="row items-center justify-between q-mb-xs">
-                  <div class="text-subtitle2 text-sm-subtitle1 text-weight-bold">
-                    <q-icon name="people" color="primary" class="q-mr-xs" />
+              <q-card-section class="q-pa-md q-pa-md-lg">
+                <div class="row items-center justify-between q-mb-md">
+                  <div class="text-subtitle1 text-weight-bold">
+                    <q-icon name="people" color="primary" class="q-mr-xs" size="20px" />
                     Party-Gäste ({{ currentRoom.member_count }})
                   </div>
-                  <q-btn flat round dense size="sm" icon="refresh" color="grey-4" @click="refreshRoom">
+                  <q-btn flat round dense icon="refresh" color="grey-4" @click="refreshRoom">
                     <q-tooltip>Aktualisieren</q-tooltip>
                   </q-btn>
                 </div>
 
-                <q-list separator class="bg-grey-9" style="border-radius: 10px; max-height: 240px; overflow-y: auto;">
-                  <q-item v-for="member in currentRoom.members" :key="member.id" class="q-py-xs q-px-sm">
-                    <q-item-section avatar style="min-width: 36px;" class="q-pr-xs">
-                      <q-avatar size="32px" class="bg-grey-8 shadow-2">
+                <q-list separator class="bg-grey-9" style="border-radius: 12px; max-height: 280px; overflow-y: auto;">
+                  <q-item v-for="member in currentRoom.members" :key="member.id" class="q-py-sm q-px-md">
+                    <q-item-section avatar style="min-width: 44px;">
+                      <q-avatar size="36px" class="bg-grey-8 shadow-2">
                         <img v-if="member.avatar_url" :src="member.avatar_url" :alt="member.name" />
-                        <q-icon v-else name="person" size="18px" color="grey-4" />
+                        <q-icon v-else name="person" size="20px" color="grey-4" />
                       </q-avatar>
                     </q-item-section>
 
                     <q-item-section>
-                      <q-item-label class="text-weight-bold text-caption text-sm-body2 row items-center no-wrap">
+                      <q-item-label class="text-weight-bold text-body2 row items-center no-wrap">
                         <span class="ellipsis">{{ member.name }}</span>
                         <q-badge
                           v-if="member.is_host"
                           color="amber-9"
                           text-color="black"
                           label="Host"
-                          class="q-ml-xs text-bold"
-                          style="font-size: 9px; padding: 1px 4px;"
+                          class="q-ml-sm text-bold"
+                          style="font-size: 10px; padding: 1px 5px;"
                         />
                         <q-badge
                           v-else-if="member.id === (user?.id || guestId)"
                           color="grey-7"
                           label="Du"
-                          class="q-ml-xs"
-                          style="font-size: 9px; padding: 1px 4px;"
+                          class="q-ml-sm"
+                          style="font-size: 10px; padding: 1px 5px;"
                         />
                       </q-item-label>
-                      <q-item-label caption class="text-grey-5" style="font-size: 11px;">
+                      <q-item-label caption class="text-grey-5">
                         {{ member.is_host ? 'Host & DJ' : 'Gast' }}
                       </q-item-label>
                     </q-item-section>
@@ -214,7 +216,7 @@
                       <q-icon
                         :name="member.is_host ? 'star' : 'headphones'"
                         :color="member.is_host ? 'amber' : 'primary'"
-                        size="16px"
+                        size="18px"
                       />
                     </q-item-section>
                   </q-item>
