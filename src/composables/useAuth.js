@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue'
-
-const API_BASE_URL = 'http://127.0.0.1:3000'
+import { API_BASE_URL } from '@/config/api'
 
 const token = ref(localStorage.getItem('spotify_session_token') || '')
 const user = ref(null)

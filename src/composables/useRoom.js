@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue'
+import { API_BASE_URL } from '@/config/api'
 import { useAuth } from './useAuth'
-
-const API_BASE_URL = 'http://127.0.0.1:3000'
 
 const currentRoom = ref(null)
 const isLoadingRoom = ref(false)
