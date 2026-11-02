@@ -350,11 +350,13 @@ async function copyRoomCode() {
   if (!currentRoom.value) return
   try {
     await navigator.clipboard.writeText(currentRoom.value.code)
-    $q.notify({
-      type: 'positive',
-      message: `Raum-Code ${currentRoom.value.code} kopiert!`,
-      timeout: 1500
-    })
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'positive',
+        message: `Raum-Code ${currentRoom.value.code} kopiert!`,
+        timeout: 1500
+      })
+    }
   } catch (e) {
     console.error(e)
   }
@@ -364,11 +366,13 @@ async function copyJoinLink() {
   if (!joinUrl.value) return
   try {
     await navigator.clipboard.writeText(joinUrl.value)
-    $q.notify({
-      type: 'positive',
-      message: 'Einladungslink in die Zwischenablage kopiert!',
-      timeout: 1500
-    })
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'positive',
+        message: 'Einladungslink in die Zwischenablage kopiert!',
+        timeout: 1500
+      })
+    }
   } catch (e) {
     console.error(e)
   }
@@ -388,17 +392,21 @@ async function confirmJoin() {
     await joinRoom(code, guestNickname.value)
     showJoinDialog.value = false
     await generateQRCode()
-    $q.notify({
-      type: 'positive',
-      message: 'Du bist der Party beigetreten!',
-      timeout: 1500
-    })
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'positive',
+        message: 'Du bist der Party beigetreten!',
+        timeout: 1500
+      })
+    }
   } catch (e) {
-    $q.notify({
-      type: 'negative',
-      message: e.message || 'Konnte nicht beitreten.',
-      timeout: 2000
-    })
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'negative',
+        message: e.message || 'Konnte nicht beitreten.',
+        timeout: 2000
+      })
+    }
   }
 }
 
@@ -411,11 +419,13 @@ async function handleLeaveRoom() {
 async function handleCloseRoom() {
   if (!currentRoom.value) return
   await closeRoom(currentRoom.value.code)
-  $q.notify({
-    type: 'info',
-    message: 'Raum wurde geschlossen.',
-    timeout: 1500
-  })
+  if (typeof $q.notify === 'function') {
+    $q.notify({
+      type: 'info',
+      message: 'Raum wurde geschlossen.',
+      timeout: 1500
+    })
+  }
   router.push('/')
 }
 

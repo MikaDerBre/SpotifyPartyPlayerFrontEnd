@@ -345,47 +345,63 @@ async function handleCreateRoom() {
   try {
     const room = await createRoom(newRoomName.value)
     showCreateDialog.value = false
-    $q.notify({
-      type: 'positive',
-      message: `Raum "${room.name}" erfolgreich erstellt!`,
-      timeout: 1500
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'positive',
+        message: `Raum "${room.name}" erfolgreich erstellt!`,
+        timeout: 1500
+      })
+    }
+    await router.push(`/room/${room.code}`).catch(() => {
+      window.location.hash = `/room/${room.code}`
     })
-    router.push(`/room/${room.code}`)
   } catch (err) {
-    $q.notify({
-      type: 'negative',
-      message: err.message || 'Fehler beim Erstellen des Raums',
-      timeout: 2500
-    })
+    console.error('Error creating room:', err)
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'negative',
+        message: err.message || 'Fehler beim Erstellen des Raums',
+        timeout: 2500
+      })
+    }
   }
 }
 
 async function handleJoinRoom() {
   const code = joinRoomCode.value.trim().toUpperCase()
   if (!code) {
-    $q.notify({
-      type: 'warning',
-      message: 'Bitte gib einen Raum-Code ein.',
-      timeout: 1500
-    })
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'warning',
+        message: 'Bitte gib einen Raum-Code ein.',
+        timeout: 1500
+      })
+    }
     return
   }
 
   try {
     const room = await joinRoom(code, joinNickname.value)
     showJoinDialog.value = false
-    $q.notify({
-      type: 'positive',
-      message: `Raum "${room.name}" beigetreten!`,
-      timeout: 1500
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'positive',
+        message: `Raum "${room.name}" beigetreten!`,
+        timeout: 1500
+      })
+    }
+    await router.push(`/room/${room.code}`).catch(() => {
+      window.location.hash = `/room/${room.code}`
     })
-    router.push(`/room/${room.code}`)
   } catch (err) {
-    $q.notify({
-      type: 'negative',
-      message: err.message || 'Raum konnte nicht gefunden werden.',
-      timeout: 2500
-    })
+    console.error('Error joining room:', err)
+    if (typeof $q.notify === 'function') {
+      $q.notify({
+        type: 'negative',
+        message: err.message || 'Raum konnte nicht gefunden werden.',
+        timeout: 2500
+      })
+    }
   }
 }
 
