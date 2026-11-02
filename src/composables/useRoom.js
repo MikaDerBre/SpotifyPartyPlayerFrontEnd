@@ -140,6 +140,20 @@ export function useRoom() {
     }
   }
 
+  async function closeRoom(code) {
+    if (!code) return
+    try {
+      await fetch(`${API_BASE_URL}/api/rooms/${code.toUpperCase()}`, {
+        method: 'DELETE'
+      })
+    } catch (e) {
+      console.warn('Error closing room:', e)
+    } finally {
+      localStorage.removeItem('party_host_room_' + code.toUpperCase())
+      currentRoom.value = null
+    }
+  }
+
   async function addToQueue(code, track) {
     if (!code || !track) return null
     try {
