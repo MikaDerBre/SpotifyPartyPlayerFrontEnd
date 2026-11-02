@@ -4,6 +4,7 @@ const routes = [
     component: () => import('@/layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
+      { path: 'room/:code', component: () => import('@/pages/RoomPage.vue') },
       { path: 'callback', component: () => import('@/pages/CallbackPage.vue') },
       { path: 'second', component: () => import('@/pages/SecondPage.vue') }
     ]
